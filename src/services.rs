@@ -56,11 +56,10 @@ fn read_services_from_json() -> Result<Vec<Service>, ServiceError> {
             Ok(services)
         }
         Err(ref e) if e.kind() == std::io::ErrorKind::NotFound => {
-            println!("Nenhum arquivo de serviços encontrado. Parece que você ainda não adicionou nenhum serviço.");
             Ok(vec![])
         }
         Err(e) => {
-            println!("Ocorreu um erro ao tentar acessar o arquivo de serviços: {}", e);
+            println!("Error on try access services file: {}", e);
             Err(ServiceError::Io(e))
         }
     }
@@ -244,9 +243,21 @@ pub fn execute(id: Option<usize>, name: Option<String>, command_type: i8) {
     }
 
     let service: &Service = if let Some(service_id) = id {
-        services.iter().find(|s| s.id == service_id).expect("Service not found.")
+        match services.iter().find(|s| s.id == service_id) {
+            Some(s) => s,
+            None => {
+                println!("Service not found.");
+                return;
+            }
+        }
     } else if let Some(ref service_name) = name {
-        services.iter().find(|s| s.name == *service_name).expect("Service not found by name.")
+        match services.iter().find(|s| s.name == *service_name) {
+            Some(s) => s,
+            None => {
+                println!("Service not found.");
+                return;
+            }
+        }
     } else {
         unreachable!();
     };
@@ -255,47 +266,47 @@ pub fn execute(id: Option<usize>, name: Option<String>, command_type: i8) {
     match command_type {
         1 => {
             if let Some(start_command) = &service.start_command {
-                println!("Iniciando serviço '{}' com comando: '{}'", service.name, start_command);
+                println!("Start service '{}' with command: '{}'", service.name, start_command);
                 output = Command::new("sh")
                     .arg("-c")
                     .arg(start_command)
                     .output()
-                    .expect("Falha ao executar o comando");
+                    .expect("Error on execute command.");
             } else {
-                println!("Comando de início não implementado.");
+                println!("Command not implemented.");
                 return;
             }
         },
         2 => {
             if let Some(stop_command) = &service.stop_command {
-                println!("Parando serviço '{}' com comando: '{}'", service.name, stop_command);
+                println!("Stop service '{}' with command: '{}'", service.name, stop_command);
                 output = Command::new("sh")
                     .arg("-c")
                     .arg(stop_command)
                     .output()
-                    .expect("Falha ao executar o comando");
+                    .expect("Error on execute command.");
             } else {
-                println!("Comando de parada não implementado.");
+                println!("Command not implemented.");
                 return;
             }
         },
         3 => {
             if let Some(restart_command) = &service.restart_command {
-                println!("Reiniciando serviço '{}' com comando: '{}'", service.name, restart_command);
+                println!("Restart service '{}' with command: '{}'", service.name, restart_command);
                 output = Command::new("sh")
                     .arg("-c")
                     .arg(restart_command)
                     .output()
-                    .expect("Falha ao executar o comando");
+                    .expect("Error on execute command.");
             } else {
-                println!("Comando de reinício não implementado.");
+                println!("Command not implemented.");
                 return;
             }
         },
         _ => {
             output = Command::new("sh")
                 .arg("-c")
-                .arg("echo 'Comando não reconhecido.'")
+                .arg("echo 'Command not fount.'")
                 .output()
                 .expect("Falha ao executar o comando");
         }
