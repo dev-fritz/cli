@@ -16,23 +16,23 @@
 ## Usage
   - To start a service:
     ```
-    service-control start <service-name>
+    cli start <service-name>
     ```
   - To stop a service:
     ```
-    service-control stop <service-name>
+    cli stop <service-name>
     ```
   - To restart a service:
     ```
-    service-control restart <service-name>
+    cli restart <service-name>
     ```
   - To add a service:
     ```
-    service-control add  --name <service-name> --start <start_command> -- stop <stop_command> --restart <restart_command>
+    cli add  --name <service-name> --start <start_command> -- stop <stop_command> --restart <restart_command>
     ```
   - To remove a service:
     ```
-    service-control remove <service-name>
+    cli remove <service-name>
     ```
     
 ## Json Format
