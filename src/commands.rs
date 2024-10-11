@@ -3,7 +3,7 @@ use clap::{Parser, Subcommand};
 use crate::services::*;
 
 #[derive(Parser)]
-#[command(name = "Services Control - CLI", version = "0.0.1", author = "Dev Fritz <fritzhenrique.dev@gmail.com>")]
+#[command(name = "Services Control - CLI", version = "0.0.2", author = "Dev Fritz <fritzhenrique.dev@gmail.com>")]
 #[command(about = "
 Services Control - CLI
     
