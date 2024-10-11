@@ -19,20 +19,29 @@ struct Cli {
 enum Commands {
     #[command(about = "Inicia um serviço utilizando o comando salvo, se houver um.", aliases=["start"])]
     StartServices{
-        #[arg(short, long, help = "Id do serviço.", default_value_t = 1)]
-        id: usize,
+        #[arg(short, long, help = "Id do serviço.", default_value = None)]
+        id: Option<usize>,
+        
+        #[arg(short, long, help = "Nome do Serviço", default_value = None)]
+        name: Option<String>,
     },
     
     #[command(about = "Para um serviço utilizando o comando salvo, se houver um.", aliases=["stop"])]
     StopServices{
-        #[arg(short, long, help = "Id do serviço.", default_value_t = 1)]
-        id: usize
+        #[arg(short, long, help = "Id do serviço.", default_value = None)]
+        id: Option<usize>,
+        
+        #[arg(short, long, help = "Nome do Serviço", default_value = None)]
+        name: Option<String>,
     },
     
     #[command(about = "Restart um serviço utilizando o comando salvo, se houver um.", aliases=["restart"])]
     RestartServices{
-        #[arg(short, long, help = "Id do serviço.")]
-        id: usize,
+        #[arg(short, long, help = "Id do serviço.", default_value = None)]
+        id: Option<usize>,
+        
+        #[arg(short, long, help = "Nome do Serviço", default_value = None)]
+        name: Option<String>,
     },
     
     #[command(about = "Lista todos os serviços salvos.", aliases=["list"])]
@@ -83,16 +92,16 @@ pub fn handle_commands() {
 
     match cli.command {
         
-        Commands::StartServices{id} => {
-            execute(id, 1);
+        Commands::StartServices{id, name} => {
+            execute(id, name, 1);
         },
         
-        Commands::StopServices{id} => {
-            execute(id, 2);
+        Commands::StopServices{id, name} => {
+            execute(id, name, 2);
         },
         
-        Commands::RestartServices{id} => {
-            execute(id, 3);
+        Commands::RestartServices{id, name} => {
+            execute(id, name, 3);
         },
         
         Commands::ListServicess => {

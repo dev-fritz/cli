@@ -231,13 +231,25 @@ pub fn remove_service(id: usize) {
     println!("Service removed.");
 }
 
-pub fn execute(id: usize, command_type: i8) {
+pub fn execute(id: Option<usize>, name: Option<String>, command_type: i8) {
     let services = read_services_from_json().expect("Failed to read services");
     if services.is_empty() {
-        println!("Nenhum serviço encontrado. Crie um serviço antes de executar comandos.");
+        println!("Add a service before execute commands.");
         return;
     }
-    let service = services.iter().find(|s| s.id == id).expect("Servidor não encontrado");
+    
+    if id.is_none() && name.is_none() {
+        println!("ID or name is obrigatory.");
+        return;
+    }
+
+    let service: &Service = if let Some(service_id) = id {
+        services.iter().find(|s| s.id == service_id).expect("Service not found.")
+    } else if let Some(ref service_name) = name {
+        services.iter().find(|s| s.name == *service_name).expect("Service not found by name.")
+    } else {
+        unreachable!();
+    };
     let output: Output;
     
     match command_type {
