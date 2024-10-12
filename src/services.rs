@@ -1,9 +1,12 @@
 use crate::errors::ServiceError;
+use crate::commands::Cli;
 use std::fs::{File, OpenOptions};
 use std::io::{BufWriter, Write, Read};
 use std::process::{Command, Output};
 use std::env;
 
+use clap::CommandFactory;
+use clap_complete::{generate, Shell};
 use crossterm::{execute, style::{Color, Print, ResetColor, SetForegroundColor}, cursor::MoveTo};
 use crossterm::terminal::{Clear, ClearType};
 use serde::{Serialize, Deserialize};
@@ -16,6 +19,39 @@ struct Service {
     start_command: Option<String>,
     stop_command: Option<String>,
     restart_command: Option<String>,
+}
+
+pub fn generate_bash_completion() {
+    let completation_path = format!("/home/{}/.cli", get_user_name());
+    let completion_file = format!("{completation_path}/bash_completion.sh");
+    
+    match File::open(&completion_file) {
+        Ok(_) => {
+            return;
+        }
+        Err(_) => {
+            std::fs::create_dir_all(&completation_path).expect("Error on create dir /.cli");
+        
+            let file = OpenOptions::new()
+                .write(true)
+                .create(true)
+                .truncate(true)
+                .open(&completion_file)
+                .expect("Error on create bash_completion.sh");
+        
+            let mut buffer = BufWriter::new(file);
+        
+            generate(Shell::Bash, &mut Cli::command(), "cli", &mut buffer);
+        
+            buffer.flush().expect("Error on save autocomplete script");
+            
+            println!("
+    Script to autocomplete Bash save in: {completion_file}
+    To use the autocomplete script, add the following line to your .bashrc or .bash_profile:
+        'echo \"source {completion_file}\" >> ~/.bashrc'
+    ");
+        }
+    }
 }
 
 fn get_user_name() -> String {

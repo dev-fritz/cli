@@ -1,10 +1,11 @@
 [package]
 name = "Service-Control"
-version = "0.0.2"
+version = "0.0.3"
 edition = "2021"
 
 [dependencies]
 clap = { version = "4.5.19", features = ["derive"] }
+clap_complete = "4.5.33"
 crossterm = "0.28.1"
 serde = { version = "1.0.210", features = ["derive"] }
 serde_json = "1.0.128"
