@@ -48,7 +48,7 @@ pub fn generate_bash_completion() {
             println!("
     Script to autocomplete Bash save in: {completion_file}
     To use the autocomplete script, add the following line to your .bashrc or .bash_profile:
-        'echo \"source {completion_file}\" >> ~/.bashrc'
+        'echo \"source {completion_file}\" >> ~/.bashrc && source ~/.bashrc'
     ");
         }
     }
@@ -116,6 +116,21 @@ fn write_service_to_json(service: Service) {
     
     buffer.write_all(json_data.as_bytes()).expect("Failed to write data to JSON file");
     buffer.flush().expect("Failed to flush buffer");
+}
+
+fn rewrite_services_to_json(services: &[Service]) -> Result<(), std::io::Error> {
+    let file = OpenOptions::new()
+        .write(true)
+        .truncate(true)
+        .open(get_path())?;
+    
+    let mut buffer = BufWriter::new(file);
+    let json_data = serde_json::to_string_pretty(services)?;
+    
+    buffer.write_all(json_data.as_bytes())?;
+    buffer.flush()?;
+    
+    Ok(())
 }
 
 fn reorganize_ids() {
@@ -245,28 +260,43 @@ pub fn edit_service_in_json(
     println!("Service edited.");
 }
 
-pub fn remove_service(id: usize) {
-    let mut services = read_services_from_json().expect("Failed to read services");
+pub fn remove_service(id: Option<usize>, name: Option<String>) {
+    let mut services = match read_services_from_json() {
+        Ok(services) => services,
+        Err(e) => {
+            eprintln!("Error reading services: {}", e);
+            return;
+        }
+    };
     
-    services.retain(|s| s.id != id);
+    if id.is_none() && name.is_none() {
+        println!("Please provide an ID or a name to remove a service.");
+        return;
+    }
     
-    let file = OpenOptions::new()
-        .write(true)
-        .truncate(true)
-        .open(get_path())
-        .expect("Failed to open JSON file");
+    let original_len = services.len();
+    services.retain(|s| {
+        let id_matches = id.map_or(true, |id| s.id != id);
+        let name_matches = name.as_ref().map_or(true, |n| s.name != *n);
+        id_matches && name_matches
+    });
+
+    if services.len() == original_len {
+        println!("No matching service found to remove.");
+        return;
+    }
     
-    let mut buffer = BufWriter::new(file);
-    let json_data = serde_json::to_string_pretty(&services).expect("Failed to serialize services");
-    
-    buffer.write_all(json_data.as_bytes()).expect("Failed to write data to JSON file");
-    buffer.flush().expect("Failed to flush buffer");
+    if let Err(e) = rewrite_services_to_json(&services) {
+        eprintln!("Error writing services to JSON file: {}", e);
+        return;
+    }
+
     reorganize_ids();
-    
+
     println!("Service removed.");
 }
 
-pub fn execute(id: Option<usize>, name: Option<String>, command_type: i8) {
+pub fn execute(mut id: Option<usize>, name: Option<String>, command_type: i8) {
     let services = read_services_from_json().expect("Failed to read services");
     if services.is_empty() {
         println!("Add a service before execute commands.");
@@ -274,8 +304,7 @@ pub fn execute(id: Option<usize>, name: Option<String>, command_type: i8) {
     }
     
     if id.is_none() && name.is_none() {
-        println!("ID or name is obrigatory.");
-        return;
+        id = Some(1);
     }
 
     let service: &Service = if let Some(service_id) = id {
@@ -344,13 +373,13 @@ pub fn execute(id: Option<usize>, name: Option<String>, command_type: i8) {
                 .arg("-c")
                 .arg("echo 'Command not fount.'")
                 .output()
-                .expect("Falha ao executar o comando");
+                .expect("Error on execute command.");
         }
     }
 
     if output.status.success() {
-        println!("Comando executado com sucesso.\n {}", String::from_utf8_lossy(&output.stdout));
+        println!("Commmand executed with success.\n {}", String::from_utf8_lossy(&output.stdout));
     } else {
-        eprintln!("Erro na execução do comando: {}", String::from_utf8_lossy(&output.stderr));
+        eprintln!("Error on execute command: {}", String::from_utf8_lossy(&output.stderr));
     }
 }
