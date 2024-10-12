@@ -3,13 +3,13 @@ use clap::{Parser, Subcommand};
 use crate::services::*;
 
 #[derive(Parser)]
-#[command(name = "Services Control - CLI", version = "0.0.3", author = "Dev Fritz <fritzhenrique.dev@gmail.com>")]
+#[command(name = "Services Control - CLI", version = "0.0.4", author = "Dev Fritz <fritzhenrique.dev@gmail.com>")]
 #[command(about = "
 Services Control - CLI
     
-    Essa CLI funciona com um arquivo JSON para armazenar os serviços e seus comandos.
-    É criado uma pasta oculta para salvar o json com os comandos dos serviços. 
-    Os comandos são executados no terminal através do id que é salvo no arquivo.")]
+    This CLI works with a JSON file to store services and their commands.
+    Is created a hidden folder to save the json with the services commands.
+    The commands are executed in the terminal through the id that is saved in the file.")]
 pub struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -17,72 +17,75 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
-    #[command(about = "Inicia um serviço utilizando o comando salvo, se houver um.")]
+    #[command(about = "Start a service.")]
     Start{
-        #[arg(short, long, help = "Id do serviço.", default_value = None)]
+        #[arg(short, long, help = "Service id.", default_value = None)]
         id: Option<usize>,
         
-        #[arg(short, long, help = "Nome do Serviço", default_value = None)]
+        #[arg(short, long, help = "Service Name", default_value = None)]
         name: Option<String>,
     },
     
-    #[command(about = "Para um serviço utilizando o comando salvo, se houver um.")]
+    #[command(about = "Stop a service.")]
     Stop{
-        #[arg(short, long, help = "Id do serviço.", default_value = None)]
+        #[arg(short, long, help = "Service id", default_value = None)]
         id: Option<usize>,
         
-        #[arg(short, long, help = "Nome do Serviço", default_value = None)]
+        #[arg(short, long, help = "Service Name", default_value = None)]
         name: Option<String>,
     },
     
-    #[command(about = "Restart um serviço utilizando o comando salvo, se houver um.")]
+    #[command(about = "Restart a service.")]
     Restart{
-        #[arg(short, long, help = "Id do serviço.", default_value = None)]
+        #[arg(short, long, help = "Service id", default_value = None)]
         id: Option<usize>,
         
-        #[arg(short, long, help = "Nome do Serviço", default_value = None)]
+        #[arg(short, long, help = "Service Name", default_value = None)]
         name: Option<String>,
     },
     
-    #[command(about = "Lista todos os serviços salvos.")]
+    #[command(about = "List all save services.")]
     List,
     
-    #[command(about = "Adiciona um novo serviço.")]
+    #[command(about = "Adiciona a new service.")]
     Add{
-        #[arg(short, long, help = "Nome do serviço.")]
+        #[arg(short, long, help = "Service name.")]
         name: String,
         
-        #[arg(long="start", help = "Comando para execução do serviço.", default_value = None)]
+        #[arg(long="start", help = "Command to start execute a service.", default_value = None)]
         start_commands: Option<String>,
 
-        #[arg(long="stop", help = "Comando para parar a execução do serviço.", default_value = None)]
+        #[arg(long="stop", help = "Command to stop execute a service.", default_value = None)]
         stop_commands: Option<String>,
 
-        #[arg(long="restart", help = "Comando para reiniciar o serviço.", default_value = None)]
+        #[arg(long="restart", help = "Command to restart execute a service.", default_value = None)]
         restart_commands: Option<String>,
     },
     
-    #[command(about = "Remove um serviço e reorganiza os ids dos serviços.", aliases=["rm"])]
+    #[command(about = "Remove a service by id and reorganize ids..", aliases=["rm"])]
     Remove{
-        #[arg(short, long, help = "ID do serviço que será removido")]
-        id: usize,
+        #[arg(short, long, help = "Service id", default_value = None)]
+        id: Option<usize>,
+        
+        #[arg(short, long, help = "Service Name", default_value = None)]
+        name: Option<String>,
     },
     
-    #[command(about = "Edita um serviço, salvando somente os campos enviados.")]
+    #[command(about = "Edit a service.")]
     Edit{
-        #[arg(short, long, help = "Id do serviço.")]
+        #[arg(short, long, help = "Service id")]
         id: usize,
         
-        #[arg(short, long, help = "Nome do serviço.", default_value = None)]
+        #[arg(short, long, help = "Service name.", default_value = None)]
         name: Option<String>,
         
-        #[arg(long="start", help = "Comando para execução do serviço.", default_value = None)]
+        #[arg(long="start", help = "Command to start execute a service.", default_value = None)]
         start_commands: Option<String>,
 
-        #[arg(long="stop", help = "Comando para parar a execução do serviço.", default_value = None)]
+        #[arg(long="stop", help = "Command to stop execute a service.", default_value = None)]
         stop_commands: Option<String>,
 
-        #[arg(long="restart", help = "Comando para reiniciar o serviço.", default_value = None)]
+        #[arg(long="restart", help = "Command to restart execute a service.", default_value = None)]
         restart_commands: Option<String>,
     },
 }
@@ -112,8 +115,8 @@ pub fn handle_commands() {
             add_service(name, start_commands, stop_commands, restart_commands);
         },
         
-        Commands::Remove{id} => {
-            remove_service(id);
+        Commands::Remove{id, name} => {
+            remove_service(id, name);
         },
         
         Commands::Edit{id, name, start_commands, stop_commands, restart_commands} => {

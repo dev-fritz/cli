@@ -16,15 +16,15 @@
 ## Usage
   - To start a service:
     ```
-    cli start <service-name>
+    cli start -n <service-name> -i <service-id>
     ```
   - To stop a service:
     ```
-    cli stop <service-name>
+    cli stop -n <service-name> -i <service-id>
     ```
   - To restart a service:
     ```
-    cli restart <service-name>
+    cli restart -n <service-name> -i <service-id>
     ```
   - To add a service:
     ```
@@ -32,7 +32,7 @@
     ```
   - To remove a service:
     ```
-    cli remove <service-name>
+    cli remove -n <service-name> -i <service-id>
     ```
     
 ## Json Format
