@@ -43,23 +43,23 @@
         {
           "id": 1,
           "name": "service1",
-          "start_command": "start_command1",
-          "stop_command": "stop_command1",
-          "restart_command": "restart_command1"
+          "start": "start_command1",
+          "stop": "stop_command1",
+          "restart": "restart_command1"
         },
         {
           "id": 2,
           "name": "service2",
-          "start_command": "start_command2",
-          "stop_command": "stop_command2",
-          "restart_command": "restart_command2"
+          "start": "start_command2",
+          "stop": "stop_command2",
+          "restart": "restart_command2"
         },
         {
           "id": 3,
           "name": "service3",
-          "start_command": "start_command3",
-          "stop_command": "stop_command3",
-          "restart_command": "restart_command3"
+          "start": "start_command3",
+          "stop": "stop_command3",
+          "restart": "restart_command3"
         }
       ]
     }
