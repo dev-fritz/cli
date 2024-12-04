@@ -13,7 +13,7 @@
   - Check the services that depend on a service
   - Check the services that a service depends on
   
-## Usage
+## How use
   - To start a service:
     ```
     cli start -n <service-name> -i <service-id>
